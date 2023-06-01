@@ -1,5 +1,5 @@
 [package]
-name = "rustHashProject"
+name = "rustcat"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,10 @@ edition = "2021"
 
 [dependencies]
 
+colored = "2.0"
+indicatif = "0.16.2"
 rand = "0.8.5"
 sha2 = "0.10.6"
 md5 = "0.7.0"
+ntlm-hash = "0.1.0"
+md4 = "0.10.2"
