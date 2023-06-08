@@ -4,12 +4,13 @@ use colored::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use sha2::{Sha256, Digest as ShaDigest};
-use sha2::{Sha512};
-use sha1::{Sha1};
-use md5;
 use ntlm_hash::ntlm_hash;
 use md4::Md4;
+use md5;
+use sha1::{Sha1};
+use sha2::{Sha256};
+use sha2::{Sha512};
+use sha3::{Sha3_256, Digest as Sha3_256Digest};
 use std::process::exit;
 
 fn print_help_message() {
@@ -18,7 +19,7 @@ fn print_help_message() {
 
 Options:
     <hash type>         The type of the hash. This must be one of the following: 
-                        MD5, Sha1, Sha256, Sha512, NTLMv1, MD4
+                        NTLMv1, MD4, MD5, Sha1, Sha2_256, Sha2_512, Sha3_256
     <hash>              The hash to crack.
     <password file>     The path to the file containing the list of passwords to try.
 
@@ -35,6 +36,17 @@ fn banner() {
     println!("{} {}", " Written in:".bold().purple(), "Rust".bold().truecolor(183, 65, 14));
 }
 
+fn compute_ntlmv1(input: &str) -> String {
+    ntlm_hash(input)
+}
+
+fn compute_md4(input: &[u8]) -> String {
+    let mut hasher = Md4::new();
+    hasher.update(input);
+    let result = hasher.finalize();
+    format!("{:x}", result)
+}
+
 fn compute_md5(input: &[u8]) -> String {
     let result = md5::compute(input);
     format!("{:x}", result)
@@ -45,25 +57,18 @@ fn compute_sha1(input: &[u8]) -> String {
     format!("{:x}", result)
 }
 
-fn compute_sha256(input: &[u8]) -> String {
+fn compute_sha2_256(input: &[u8]) -> String {
     let result = Sha256::digest(input);
     format!("{:x}", result)
 }
 
-fn compute_sha512(input: &[u8]) -> String {
+fn compute_sha2_512(input: &[u8]) -> String {
     let result = Sha512::digest(input);
     format!("{:x}", result)
 }
 
-fn compute_ntlm(input: &str) -> String {
-    ntlm_hash(input)
-}
-
-
-fn compute_md4(input: &[u8]) -> String {
-    let mut hasher = Md4::new();
-    hasher.update(input);
-    let result = hasher.finalize();
+fn compute_sha3_256(input: &[u8]) -> String {
+    let result = Sha3_256::digest(input);
     format!("{:x}", result)
 }
 
@@ -100,12 +105,13 @@ fn main() -> Result<(), Error> {
         let line: String = line.unwrap();
         let password: String = line.trim().to_owned();
         let password_hash: String = match hash_type {
-            "Sha1" => compute_sha1(password.as_bytes()),
-            "Sha256" => compute_sha256(password.as_bytes()),
-            "Sha512" => compute_sha512(password.as_bytes()),
-            "MD5" => compute_md5(password.as_bytes()),
-            "NTLM" => compute_ntlm(&password),
+            "NTLMv1" => compute_ntlmv1(&password),
             "MD4" => compute_md4(password.as_bytes()),
+            "MD5" => compute_md5(password.as_bytes()),
+            "Sha1" => compute_sha1(password.as_bytes()),
+            "Sha2_256" => compute_sha2_256(password.as_bytes()),
+            "Sha2_512" => compute_sha2_512(password.as_bytes()),
+            "Sha3_256" => compute_sha3_256(password.as_bytes()),
             _ => panic!("WrongHash"),
         };
     
