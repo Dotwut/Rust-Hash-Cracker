@@ -5,6 +5,8 @@ use indicatif::{ProgressBar, ProgressStyle};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use sha2::{Sha256, Digest as ShaDigest};
+use sha2::{Sha512};
+use sha1::{Sha1};
 use md5;
 use ntlm_hash::ntlm_hash;
 use md4::Md4;
@@ -16,7 +18,7 @@ fn print_help_message() {
 
 Options:
     <hash type>         The type of the hash. This must be one of the following: 
-                        MD5, Sha256, NTLM, MD4
+                        MD5, Sha1, Sha256, Sha512, NTLMv1, MD4
     <hash>              The hash to crack.
     <password file>     The path to the file containing the list of passwords to try.
 
@@ -38,8 +40,18 @@ fn compute_md5(input: &[u8]) -> String {
     format!("{:x}", result)
 }
 
+fn compute_sha1(input: &[u8]) -> String {
+    let result = Sha1::digest(input);
+    format!("{:x}", result)
+}
+
 fn compute_sha256(input: &[u8]) -> String {
     let result = Sha256::digest(input);
+    format!("{:x}", result)
+}
+
+fn compute_sha512(input: &[u8]) -> String {
+    let result = Sha512::digest(input);
     format!("{:x}", result)
 }
 
@@ -88,7 +100,9 @@ fn main() -> Result<(), Error> {
         let line: String = line.unwrap();
         let password: String = line.trim().to_owned();
         let password_hash: String = match hash_type {
+            "Sha1" => compute_sha1(password.as_bytes()),
             "Sha256" => compute_sha256(password.as_bytes()),
+            "Sha512" => compute_sha512(password.as_bytes()),
             "MD5" => compute_md5(password.as_bytes()),
             "NTLM" => compute_ntlm(&password),
             "MD4" => compute_md4(password.as_bytes()),
