@@ -8,5 +8,7 @@ I wanted to learn a bit about Rust as its the new-hotness on the streets. Decide
 
 6/8/23 - Added Sha2-512, sha2-224, sha3-256. Compiled an arm64 binary and released.
 
+6/9/23 - Compiled an amd64 binary and released.
+
 https://github.com/Dotwut/Rust-Hash-Cracker/assets/104949264/40e4170c-8250-4ad1-bd6e-59b6b6799198
 
